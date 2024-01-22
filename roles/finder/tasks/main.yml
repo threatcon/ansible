@@ -1,0 +1,42 @@
+# Task file for finder role
+---
+- name: Get list of files
+  find:
+    paths: '{{ search_path }}'
+    file_type: file
+    recurse: true
+  ignore_errors: true
+  register: found_files
+
+- name: Set file count
+  set_fact:
+    file_count: '{{ found_files.matched }}'
+  ignore_errors: true
+  register: ignore_errors_register
+
+- name: Attempt to match find files in provided list
+  when: file_count != 0
+  block:
+    - name: Find files in list
+      find:
+        paths: '{{ search_path }}'
+        file_type: file
+        patterns: "{{ item }}"
+        recurse: true
+      register: list_matches
+      with_items: '{{ search_list }}'
+
+    - name: Create list of found files with path
+      set_fact:
+        matched_files: "{{ matched_files | default([]) + [item.path] }}"
+      with_items: "{{ list_matches.results | map(attribute='files') | list }}"
+      when: list_matches.results | length > 0
+  rescue:
+    - name: Show failed task
+      debug:
+        msg: '{{ ansible_failed_task.name }}'
+  always:
+    - name: Show results
+      debug:
+        msg: '{{ matched_files }}'
+      when: matched_files is defined

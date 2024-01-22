@@ -1,0 +1,32 @@
+---
+# tasks file for foldersetup role
+- name: Delete existing directories
+  file:
+    state: absent
+    path: '{{ base_path }}'
+  tags:
+    - initial
+
+- name: Create new directories
+  file:
+    state: directory
+    path: '{{ item }}'
+    mode: '{{ file_mode }}'
+    recurse: true
+  with_items: '{{ create_paths }}'
+  tags:
+    - reusable
+
+- name: Get dir listing
+  find:
+    paths: '{{ output_path }}'
+    file_type: file
+  register: directory
+  tags:
+    - always
+
+- name: Show dir listing
+  debug:
+    msg: '{{ directory.files }}'
+    tags:
+      - always

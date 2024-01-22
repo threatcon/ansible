@@ -1,0 +1,21 @@
+---
+- name: Email results
+  community.general.mail:
+    host:
+      '{{ email_host }}'
+    port:
+      '{{ email_port }}'
+    username:
+      '{{ email_username }}'
+    password:
+      '{{ email_password }}'
+    to:
+      '{{ email_to }}'
+    from:
+      '{{ email_from }}'
+    subject:
+      "{{ email_subject }}}}"
+    body:
+      "{{ email_body }}"
+    attach:
+      '{{ email_attachment }}'

@@ -1,0 +1,24 @@
+---
+dependencies: []
+
+galaxy_info:
+  standalone: true
+  author: "Antonio Turner"
+  description: "General email role"
+  license: "license (BSD, MIT)"
+  min_ansible_version: '2.10'
+  platforms:
+    - name: Fedora
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - all
+  galaxy_tags:
+    - networking
+    - system
+    - web
+    - https

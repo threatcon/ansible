@@ -1,0 +1,24 @@
+---
+dependencies: []
+
+galaxy_info:
+  standalone: true
+  role_name: finder
+  author: "Antonio Turner"
+  description: "Uses a list to searche for exiting files that match agiven criteria"
+  license: "license (BSD, MIT)"
+  min_ansible_version: '2.10'
+  platforms:
+    - name: Fedora
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - all
+  galaxy_tags:
+    - networking
+    - system
+    - utilities

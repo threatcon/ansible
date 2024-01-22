@@ -1,0 +1,27 @@
+# Tasks file for string_transform role
+- name: Create device list from input
+  set_fact:
+    dev_list: "{{ (ip_list | replace(' ', '')).split(',') }}"
+
+- name: Display output
+  debug:
+    var: dev_list
+
+- name: Copy output to file
+  copy:
+    content: |-
+          {% for key in dev_list %}
+          {{ key }}
+          {% endfor %}
+    dest: '{{ new_inventory_full_path }}'
+    mode: '{{ file_mode }}'
+
+- name: Get dir listing
+  find:
+    paths: '{{ output_path }}'
+    file_type: file
+  register: stored_dev_list
+
+- name: Show dir listing
+  debug:
+    msg: '{{ stored_dev_list.files }}'

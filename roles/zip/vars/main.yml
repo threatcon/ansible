@@ -1,0 +1,2 @@
+zip_output_header: "your_naming_convention"
+zip_file: "{{ zip_output_header }}.zip"

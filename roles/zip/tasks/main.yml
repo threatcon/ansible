@@ -1,0 +1,44 @@
+---
+- name: Full zip path
+  set_fact:
+    full_zip_path: "{{ base_path }}/{{ zip_file }}"
+
+- name: Delete previous zip
+  file:
+    state: absent
+    path: '{{ full_zip_path }}'
+
+- name: Create a zip archive
+  archive:
+    path: '{{ base_path }}'
+    dest: '{{ full_zip_path }}'
+    format: zip
+    mode: '{{ file_mode }}'
+
+- name: Zip file storage location
+  set_fact:
+    store_location: '{{ zip_storage_location }}/{{ zip_output_header }}'
+
+- name: Create zip store
+  file:
+    state: directory
+    path: '{{ store_location }}'
+    mode: '{{ file_mode }}'
+
+- name: Save itemss
+  copy:
+    src: '{{ item.path }}'
+    dest: '{{ store_location }}'
+    backup: true
+    mode: '{{ file_mode }}'
+  with_items: '{{ zip_file_list }}'
+
+- name: Get dir listing
+  find:
+    paths: '{{ store_location }}'
+    file_type: file
+  register: archive_directory
+
+- name: Show dir listing
+  debug:
+    msg: '{{ archive_directory.files }}'
