@@ -181,15 +181,15 @@ Use this space to list resources you find helpful and would like to give credit 
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=for-the-badge
-[contributors-url]: https://github.com/othneildrew/Best-README-Template/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/othneildrew/Best-README-Template.svg?style=for-the-badge
+[contributors-shield]: https://img.shields.io/github/contributors/threatcon/ansible.svg?style=for-the-badge
+[contributors-url]: https://github.com/threatcon/ansible/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/threatcon/ansible.svg?style=for-the-badge
 [forks-url]: https://github.com/threatcon/ansible/network/members
-[stars-shield]: https://img.shields.io/github/stars/othneildrew/Best-README-Template.svg?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/threatcon/ansible.svg?style=for-the-badge
 [stars-url]: https://github.com/threatcon/ansible/stargazers
-[issues-shield]: https://img.shields.io/github/issues/othneildrew/Best-README-Template.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/threatcon/ansible.svg?style=for-the-badge
 [issues-url]: https://github.com/threatcon/ansible/issues
-[license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/github/license/threatcon/ansible.svg?style=for-the-badge
 [license-url]: https://github.com/threatcon/ansible/blob/master/LICENSE.txt
 [product-screenshot]: images/IMG_2113.png
 [Ansible]: https://img.shields.io/badge/ansible-%231A1918.svg?style=for-the-badge&logo=ansible&logoColor=61DAFB
