@@ -35,13 +35,17 @@
 
   <h3 align="center">The Ansible of Things</h3>
 
-  <p align="center">
-    My personal repo of Ansible related codes. Some authored by me, others found on the interwebs.
-    <br />
+  <p align="left">
+    My personal repo of Ansible related code.<br /> 
+    Some authored by me...<br /> 
+    Others found on the interwebs... <br />
+    Credit ALWAYS given to the original author or source if known!<br /> <br />
+    [Disclaimer: Keep in mind, due to the nature of programming, multiple people can come up with the same implementation of a solution.]
+    <br /><br />
     ·
     <a href="https://github.com/threatcon/ansible/issues">Report Bug</a>
     ·
-    <a href="https://github.com/threatcon/ansible/issues">Request Feature</a>
+    <a href="https://github.com/threatcon/ansible/issues">Request Feature</a><br />
   </p>
 </div>
 
