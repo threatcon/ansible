@@ -76,7 +76,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]]
+![Product][product-screenshot]
 
 I got tired of writing snippets in OneNote or Notepad++ so I'm putting all my findings here and sharing it with the world.
 Or at least with you. (See what I did there?!)
@@ -191,7 +191,7 @@ Use this space to list resources you find helpful and would like to give credit 
 [issues-url]: https://github.com/threatcon/ansible/issues
 [license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=for-the-badge
 [license-url]: https://github.com/threatcon/ansible/blob/master/LICENSE.txt
-[product-screenshot]: images/ansibull-community.png
+[product-screenshot]: images/IMG_2113.png
 [Ansible]: https://img.shields.io/badge/ansible-%231A1918.svg?style=for-the-badge&logo=ansible&logoColor=61DAFB
 [Ansible-url]: https://www.ansible.com/
 [Jinja]: https://img.shields.io/badge/jinja-white.svg?style=for-the-badge&logo=jinja&logoColor=FF3E00
