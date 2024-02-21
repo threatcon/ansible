@@ -1,0 +1,17 @@
+# Define a list to split
+list: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+# Define the sizes of the smaller lists
+sizes: [3, 2, 4, 1]
+
+# Initialize an empty list to store the smaller lists
+sublists: []
+
+# Loop through the sizes and use the slice filter to get the corresponding sublist
+- set_fact:
+    sublists: "{{ sublists + [list | slice(item) | list] }}"
+  loop: "{{ sizes }}"
+
+# Print the result
+- debug:
+    var: sublists
