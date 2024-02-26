@@ -1,0 +1,22 @@
+---
+default_fail: false
+# For words in a list
+list_delimiter: ' '
+initial_list: 'the red apple fell from the tree'
+my_list: "{{ initial_list.split(list_delimiter) }}"
+
+# For letters in a list
+# initial_list: 'onomatopoeia'
+# my_list: "{{ initial_list.split() }}"
+
+# Just a list a list
+# my_list: 
+#   - apple
+#   - red
+#   - mango
+#   - fell
+#   - from
+#   - the
+#   - tree
+
+search_term: '[pP]'

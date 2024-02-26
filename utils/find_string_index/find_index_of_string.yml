@@ -1,0 +1,31 @@
+- name: Find index of string in list
+  hosts: localhost
+  gather_facts: false
+
+  vars_files:
+    - vars/vars_find_index.yml
+
+  tasks:
+
+    - name: Get string index
+      ansible.builtin.set_fact:
+        idx_value: "{{ lookup('ansible.utils.index_of', my_list, 'regex', search_term) }}"
+      ignore_errors: true
+      register: get_string_index
+
+    - name: Get string index
+      ansible.builtin.set_fact:
+        idx_value: "Value not found in list"
+      when: idx_value == []
+      ignore_errors: true
+      register: ignore_errors_register
+
+    - name: Get string index
+      ansible.builtin.debug:
+        msg: "{{ idx_value }}"
+      ignore_errors: true
+      register: ignore_errors_register
+
+    - name: Get errors
+      ansible.builtin.debug:
+        msg: "{{ ignore_errors_register }}"
