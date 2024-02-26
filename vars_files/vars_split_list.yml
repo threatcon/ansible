@@ -1,0 +1,8 @@
+# Define a list to split
+list: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+# Define the sizes of the smaller lists
+sizes: [3, 2, 4, 1]
+
+# Initialize an empty list to store the smaller lists
+sublists: []
