@@ -1,0 +1,88 @@
+---
+
+  - hosts: all
+    connection: local
+    gather_facts: no
+
+    vars:
+      loop_test: 1
+      header_text: 
+        - hostname
+        - ip
+        - device_type
+
+    tasks:
+    - name: get dnac token
+      uri:
+        url: '{{dnaurl}}/dna/system/api/v1/auth/token'
+        method: POST
+        headers:
+          authorization: 'Basic {{ dnac_automation_base64 }}'
+          content-type: application/json
+        validate_certs: no
+      register: dnactoken
+
+    - name: Pull unassigned devices from dnac
+      uri:
+        url: '{{dnaurl}}api/v1/ncp-node/graphql'
+        method: POST
+        headers:
+          Accept: application/json; charset=UTF-8
+          Content-Type: application/json
+          Cookie: "X-JWT-ACCESS-TOKEN={{ dnactoken['json']['Token'] }}"
+        status_code: 200
+        return_content: yes
+        use_proxy: no
+        validate_certs: no
+        body: '{"operationName":null,"variables":{},"query":"{\n  allDeviceStore(limit: 100000, sortBy: {field: \"hostname\", order: \"asc\"}, filters: [{field: \"__rd_site\", value: \"\"}]) \n  {\n    totalCount\n   items {\n      id\n      hostname\n      family\n      managementIpAddress\n      reachabilityStatus\n      managementState\n      softwareVersion\n      serialNumber\n      series\n      platformId\n      __typename\n    }\n    __typename\n  }\n}\n"}'
+        #body: '{"operationName":null,"variables":{},"query":"{\n  allDeviceStore(limit: 100000, sortBy: {field: \"hostname\", order: \"asc\"}, filters: [{field: \"errorCode\", value: \"SERIAL-NUMBER-CONFLICT\"}]) \n  {\n    totalCount\n   items {\n      id\n      hostname\n      errorCode\n      family\n      managementIpAddress\n      reachabilityStatus\n      managementState\n      softwareVersion\n      serialNumber\n      series\n      platformId\n      __typename\n    }\n    __typename\n  }\n}\n"}'
+      register: output
+
+    - name: extraction
+      set_fact:  
+        extracted_values: "{{ output['json']['data']['allDeviceStore']['items'] }}"
+
+    - name: check extracted
+      debug:
+       var: extracted_values
+
+    - name: create header
+      set_fact:
+        csv_data: "{{header_text[0]}},{{header_text[1]}},{{header_text[2]}}\
+        \n"
+
+    - name: get timestamp
+      set_fact: time="{{lookup('pipe','date \"+%Y-%m-%d-%H-%M\"')}}"
+
+    - name: set file name
+      set_fact: output_file="network_devices_without_location_information-{{ time }}.csv"
+
+    - name: Create list 
+      set_fact:
+        csv_data: "{{ csv_data }}\
+         {{ item.hostname }},{{item.managementIpAddress}},{{item.platformId}}\
+         \n"
+      when: item.family != "Unified AP"
+      with_items: "{{extracted_values}}"
+
+    - name: Write file
+      copy:
+        content: "{{ csv_data }}" 
+        dest: "{{ output_file }}"
+
+    - name: email results
+      mail:
+        host: {{email_server}}
+        port: 25
+        to:
+        - {{send_to}}
+        from: {{server_email}}
+        subject: "Unassigned DNAC Devices {{ time }}"
+        body: "Attached is this week's list of unassigned devices."
+        attach:
+          - "{{ output_file }}"
+
+    - name: Delete file
+      file:
+        state: absent
+        path: "{{ output_file }}"

@@ -1,0 +1,688 @@
+---
+
+  - hosts: all
+    connection: local
+    gather_facts: no
+
+    vars:
+      ansible_network_os: ios
+      ansible_connection: network_cli
+      ansible_user: '{{ user_name }}'
+      ansible_password: '{{ prod_password }}'
+      command_list:
+        - show version
+        - show ip bgp sum
+        - show switch
+        - show module
+        - show ip route
+        - show ip arp
+        - show cdp neigh detail
+        - show mac address-table
+        - show startup-config
+        - show int status
+        - show ip prot
+        - show vrf
+        - show standby brief
+        - show ip ospf neigh
+        - show run spanning-tree
+        - show spanning-tree root
+        - show spanning-tree
+        - show int counters errors
+        - show int trunk
+        - show vlan
+        - show port-channel summary
+        - show ip route vrf all
+        - show ip rpoute vrf all summary
+        - show run | inc hostname
+        - write mem
+      banner_0: |-
+        **************************************************
+        *******************show version*******************
+        **************************************************
+      banner_1: |- 
+        **************************************************
+        *****************show ip bgp sum******************
+        **************************************************
+      banner_2: |- 
+        **************************************************
+        ********************show switch*******************
+        **************************************************
+      banner_3: |- 
+        **************************************************
+        ********************show module*******************
+        **************************************************
+      banner_4: |- 
+        **************************************************
+        *******************show ip route******************
+        **************************************************
+      banner_5: |- 
+        **************************************************
+        ********************show ip arp*******************
+        **************************************************
+      banner_6: |- 
+        **************************************************
+        **************show cdp neigh detail***************
+        **************************************************
+      banner_7: |-  
+        **************************************************
+        **************show mac address table**************
+        **************************************************
+      banner_8: |- 
+        **************************************************
+        ****************show startup-config***************
+        **************************************************
+      banner_9: |- 
+        **************************************************
+        *****************show int status******************
+        **************************************************
+      banner_10: |- 
+        **************************************************
+        *******************show ip prot*******************
+        **************************************************
+      banner_11: |- 
+        **************************************************
+        *********************show vrf*********************
+        **************************************************
+      banner_12: |- 
+        **************************************************
+        ****************show standby brief****************
+        **************************************************
+      banner_13: |- 
+        **************************************************
+        ****************show ip ospf neigh****************
+        **************************************************
+      banner_14: |- 
+        **************************************************
+        **************show run spanning-tree**************
+        **************************************************
+      banner_15: |- 
+        **************************************************
+        **************show spanning-tree root*************
+        **************************************************
+      banner_16: |- 
+        **************************************************
+        ****************show spanning-tree****************
+        **************************************************
+      banner_17: |- 
+        **************************************************
+        *************show int counters errors*************
+        **************************************************
+      banner_18: |- 
+        **************************************************
+        ******************show int trunk******************
+        **************************************************
+      banner_19: |- 
+        **************************************************
+        *********************show vlan********************
+        **************************************************
+      banner_20: |- 
+        **************************************************
+        ************show port-channel summary*************
+        **************************************************
+      banner_21: |- 
+        **************************************************
+        **************show ip route vrf all***************
+        **************************************************
+      banner_22: |- 
+        **************************************************
+        **********show ip rpoute vrf all summary**********
+        **************************************************
+      banner_23:  |-
+        **************DEVICE {{ device_id }}**************     
+
+    tasks:
+    - name: Set device
+      set_fact:
+        captured_ip: "{{inventory_hostname}}"
+#
+    - name: write mem
+      ios_command:
+        commands:
+            - command: "{{command_list[24]}}"
+      register: wri_mem
+      ignore_errors: true
+      when: save_config == 'YES' 
+#
+    -   name:   display output
+        debug:
+            var: wri_mem
+#
+    - name: Check write mem fail
+      set_fact:
+        captured_ip: "{{ captured_ip }} - Configuration Save FAILED!"
+      when: (wri_mem.skipped is not defined) and (wri_mem.failed) and (save_config == 'YES')
+      ignore_errors: true  
+
+    - name: Check write mem succeed
+      set_fact:
+         captured_ip: "{{ captured_ip }} - Configuration Save SUCCEEDED!"
+      when: (wri_mem.skipped is not defined) and (not wri_mem.failed) and (save_config == 'YES')
+      ignore_errors: true  
+#
+    - name: show hostname
+      ios_command:
+        commands:
+            - command: "{{command_list[23]}}"
+      register: show_hostname
+      ignore_errors: true
+
+    - name: Check show_hostname fail
+      set_fact:
+        device_id: "{{ captured_ip }}"
+      when: show_hostname.failed   
+
+    - name: Check show_hostname succeed
+      set_fact:
+         hostname: "{{show_hostname.stdout_lines }}"
+      when: not show_hostname.failed 
+
+    - name: clean hostname
+      set_fact:
+         hostname: "{{hostname | replace('hostname ','') }}"
+      when: not show_hostname.failed  
+
+    - name: set device id
+      set_fact:
+         device_id: "{{ hostname }} - {{ captured_ip }}"
+      when: not show_hostname.failed   
+#
+    - name: show version
+      ios_command:
+        commands:
+            - command: "{{command_list[0]}}"
+      register: show_version
+      ignore_errors: true
+
+    - name: Check show_version fail
+      set_fact:
+        captured_version: "failed or not supported"
+      when: show_version.failed   
+
+    - name: Check show_version succeed
+      set_fact:
+        captured_version: "{{show_version.stdout_lines}}"
+      when: not show_version.failed    
+#
+    - name: show bgp sum
+      ios_command:
+        commands:
+            - command: "{{command_list[1]}}"
+      register: show_bgp
+      ignore_errors: true
+
+    - name: Check show_bgp fail
+      set_fact:
+        captured_bgp: "failed or not supported"
+      when: show_bgp.failed   
+
+    - name: Check show_bgp succeed
+      set_fact:
+        captured_bgp: "{{show_bgp.stdout_lines}}"
+      when: not show_bgp.failed 
+#
+    - name: show switch
+      ios_command:
+        commands:
+            - command: "{{command_list[2]}}"
+      register: show_switch
+      ignore_errors: true
+
+    - name: Check show_switch fail
+      set_fact:
+        captured_switch: "failed or not supported"
+      when: show_switch.failed   
+
+    - name: Check show_switch succeed
+      set_fact:
+        captured_switch: "{{show_switch.stdout_lines}}"
+      when: not show_switch.failed 
+#
+    - name: show module
+      ios_command:
+        commands:
+            - command: "{{command_list[3]}}"
+      register: show_module
+      ignore_errors: true
+
+    - name: Check show_module fail
+      set_fact:
+        captured_module: "failed or not supported"
+      when: show_module.failed   
+
+    - name: Check show_module succeed
+      set_fact:
+        captured_module: "{{show_module.stdout_lines}}"
+      when: not show_module.failed 
+#
+    - name: show ip_route
+      ios_command:
+        commands:
+            - command: "{{command_list[4]}}"
+      register: show_ip_route
+      ignore_errors: true
+
+    - name: Check show_ip_route fail
+      set_fact:
+        captured_ip_route: "failed or not supported"
+      when: show_ip_route.failed   
+
+    - name: Check show_ip_route succeed
+      set_fact:
+        captured_ip_route: "{{show_ip_route.stdout_lines}}"
+      when: not show_ip_route.failed 
+#
+    - name: show ip_arp
+      ios_command:
+        commands:
+            - command: "{{command_list[5]}}"
+      register: show_ip_arp
+      ignore_errors: true
+
+    - name: Check show_ip_arp fail
+      set_fact:
+        captured_ip_arp: "failed or not supported"
+      when: show_ip_arp.failed   
+
+    - name: Check show_ip_arp succeed
+      set_fact:
+        captured_ip_arp: "{{show_ip_arp.stdout_lines}}"
+      when: not show_ip_arp.failed 
+#
+    - name: show cdp neigh detail
+      ios_command:
+        commands:
+            - command: "{{command_list[6]}}"
+      register: show_cdp
+      ignore_errors: true
+
+    - name: Check show_cdp fail
+      set_fact:
+        captured_cdp: "show_cdp: failed or not supported"
+      when: show_cdp.failed   
+
+    - name: Check show_cdp succeed
+      set_fact:
+        captured_cdp: "{{show_cdp.stdout_lines}}"
+      when: not show_cdp.failed 
+#
+    - name: show mac address-table
+      ios_command:
+        commands:
+            - command: "{{command_list[7]}}"
+      register: show_mac
+      ignore_errors: true
+
+    - name: Check show_mac fail
+      set_fact:
+        captured_mac: "failed or not supported"
+      when: show_mac.failed   
+
+    - name: Check show_mac succeed
+      set_fact:
+        captured_mac: "{{show_mac.stdout_lines}}"
+      when: not show_mac.failed 
+#
+    - name: show startup-config
+      ios_command:
+        commands:
+            - command: "{{command_list[8]}}"
+      register: show_startup
+      ignore_errors: true
+
+    - name: Check show_startup fail
+      set_fact:
+        captured_startup: "failed or not supported"
+      when: show_startup.failed   
+
+    - name: Check show_startup succeed
+      set_fact:
+        captured_startup: "{{show_startup.stdout_lines}}"
+      when: not show_startup.failed 
+#
+    - name: show int_status
+      ios_command:
+        commands:
+            - command: "{{command_list[9]}}"
+      register: show_int_status
+      ignore_errors: true
+
+    - name: Check show_int_status fail
+      set_fact:
+        captured_int_status: "failed or not supported"
+      when: show_int_status.failed   
+
+    - name: Check show_int_status succeed
+      set_fact:
+        captured_int_status: "{{show_int_status.stdout_lines}}"
+      when: not show_int_status.failed 
+#
+    - name: show ip_prot
+      ios_command:
+        commands:
+            - command: "{{command_list[10]}}"
+      register: show_ip_prot
+      ignore_errors: true
+
+    - name: Check show_ip_prot fail
+      set_fact:
+        captured_ip_prot: "failed or not supported"
+      when: show_ip_prot.failed   
+
+    - name: Check show_ip_prot succeed
+      set_fact:
+        captured_ip_prot: "{{show_ip_prot.stdout_lines}}"
+      when: not show_ip_prot.failed 
+#
+    - name: show vrf
+      ios_command:
+        commands:
+            - command: "{{command_list[11]}}"
+      register: show_vrf
+      ignore_errors: true
+
+    - name: Check show_vrf fail
+      set_fact:
+        captured_vrf: "failed or not supported"
+      when: show_vrf.failed   
+
+    - name: Check show_vrf succeed
+      set_fact:
+        captured_vrf: "{{show_vrf.stdout_lines}}"
+      when: not show_vrf.failed 
+#
+    - name: show standby_brief
+      ios_command:
+        commands:
+            - command: "{{command_list[12]}}"
+      register: show_standby_brief
+      ignore_errors: true
+
+    - name: Check show_standby_brief fail
+      set_fact:
+        captured_standby_brief: "failed or not supported"
+      when: show_standby_brief.failed   
+
+    - name: Check show_standby_brief succeed
+      set_fact:
+        captured_standby_brief: "{{show_standby_brief.stdout_lines}}"
+      when: not show_standby_brief.failed 
+#
+    - name: show ip_ospf_neigh
+      ios_command:
+        commands:
+            - command: "{{command_list[13]}}"
+      register: show_ip_ospf_neigh
+      ignore_errors: true
+
+    - name: Check show_ip_ospf_neigh fail
+      set_fact:
+        captured_ip_ospf_neigh: "failed or not supported"
+      when: show_ip_ospf_neigh.failed   
+
+    - name: Check show_ip_ospf_neigh succeed
+      set_fact:
+        captured_ip_ospf_neigh: "{{show_ip_ospf_neigh.stdout_lines}}"
+      when: not show_ip_ospf_neigh.failed 
+#
+    - name: show run_spanning-tree
+      ios_command:
+        commands:
+            - command: "{{command_list[14]}}"
+      register: show_run_spanning_tree
+      ignore_errors: true
+
+    - name: Check show_run_spanning-tree fail
+      set_fact:
+        captured_run_spanning_tree: "failed or not supported"
+      when: show_run_spanning_tree.failed   
+
+    - name: Check show_run_spanning-tree succeed
+      set_fact:
+        captured_run_spanning_tree: "{{show_run_spanning_tree.stdout_lines}}"
+      when: not show_run_spanning_tree.failed 
+#
+    - name: show spanning-tree_root
+      ios_command:
+        commands:
+            - command: "{{command_list[15]}}"
+      register: show_spanning_tree_root
+      ignore_errors: true
+
+    - name: Check show_spanning-tree_root fail
+      set_fact:
+        captured_spanning_tree_root: "failed or not supported"
+      when: show_spanning_tree_root.failed   
+
+    - name: Check show_spanning-tree_root succeed
+      set_fact:
+        captured_spanning_tree_root: "{{show_spanning_tree_root.stdout_lines}}"
+      when: not show_spanning_tree_root.failed 
+#    
+    - name: show spanning-tree
+      ios_command:
+        commands:
+            - command: "{{command_list[16]}}"
+      register: show_spanning_tree
+      ignore_errors: true
+
+    - name: Check show_spanning-tree fail
+      set_fact:
+        captured_spanning_tree: "failed or not supported"
+      when: show_spanning_tree.failed   
+
+    - name: Check show_spanning-tree succeed
+      set_fact:
+        captured_spanning_tree: "{{show_spanning_tree.stdout_lines}}"
+      when: not show_spanning_tree.failed 
+#
+    - name: show counters
+      ios_command:
+        commands:
+            - command: "{{command_list[17]}}"
+      register: show_counters
+      ignore_errors: true
+
+    - name: Check show_counters fail
+      set_fact:
+        captured_counters: "failed or not supported"
+      when: show_counters.failed   
+
+    - name: Check show_counters succeed
+      set_fact:
+        captured_counters: "{{show_counters.stdout_lines}}"
+      when: not show_counters.failed     
+#
+    - name: show trunk
+      ios_command:
+        commands:
+            - command: "{{command_list[18]}}"
+      register: show_trunk
+      ignore_errors: true
+
+    - name: Check show_trunk fail
+      set_fact:
+        captured_trunk: "failed or not supported"
+      when: show_trunk.failed   
+
+    - name: Check show_trunk succeed
+      set_fact:
+        captured_trunk: "{{show_trunk.stdout_lines}}"
+      when: not show_trunk.failed 
+# 
+    - name: show vlan
+      ios_command:
+        commands:
+            - command: "{{command_list[19]}}"
+      register: show_vlan
+      ignore_errors: true
+
+    - name: Check show_vlan fail
+      set_fact:
+        captured_vlan: "failed or not supported"
+      when: show_vlan.failed   
+
+    - name: Check show_vlan succeed
+      set_fact:
+        captured_vlan: "{{show_vlan.stdout_lines}}"
+      when: not show_vlan.failed 
+#
+    - name: show port-channel
+      ios_command:
+        commands:
+            - command: "{{command_list[20]}}"
+      register: show_port_channel
+      ignore_errors: true
+
+    - name: Check show_port-channel fail
+      set_fact:
+        captured_port_channel: "failed or not supported"
+      when: show_port_channel.failed   
+
+    - name: Check show_port-channel succeed
+      set_fact:
+        captured_port_channel: "{{show_port_channel.stdout_lines}}"
+      when: not show_port_channel.failed 
+#
+    - name: show route vrf
+      ios_command:
+        commands:
+            - command: "{{command_list[21]}}"
+      register: show_route_vrf
+      ignore_errors: true
+
+    - name: Check show_route_vrf fail
+      set_fact:
+        captured_route_vrf: "failed or not supported"
+      when: show_route_vrf.failed   
+
+    - name: Check show_route_vrf succeed
+      set_fact:
+        captured_route_vrf: "{{show_route_vrf.stdout_lines}}"
+      when: not show_route_vrf.failed 
+#
+    - name: show rpoute vrf
+      ios_command:
+        commands:
+            - command: "{{command_list[22]}}"
+      register: show_rpoute_vrf
+      ignore_errors: true
+
+    - name: Check show_rpoute_vrf fail
+      set_fact:
+        captured_rpoute_vrf: "failed or not supported"
+      when: show_rpoute_vrf.failed   
+
+    - name: Check show_rpoute_vrf succeed
+      set_fact:
+        captured_rpoute_vrf: "{{show_rpoute_vrf.stdout_lines}}"
+      when: not show_rpoute_vrf.failed
+#
+    - name: Compile data
+      set_fact:
+        captured_output:  "{{ banner_23 }}\
+        \n{{ banner_0 }}\
+        \n{{captured_version}}\
+        \n{{ banner_1 }}\
+        \n{{captured_bgp}}\
+        \n{{ banner_2 }}\
+        \n{{captured_switch}}\
+        \n{{ banner_3 }}\
+        \n{{captured_module}}\
+        \n{{ banner_4 }}\
+        \n{{captured_ip_route}}\
+        \n{{ banner_5 }}\
+        \n{{captured_ip_arp}}\
+        \n{{ banner_6 }}\
+        \n{{captured_cdp}}\
+        \n{{ banner_7 }}\
+        \n{{captured_mac}}\
+        \n{{ banner_8 }}\
+        \n{{captured_startup}}\
+        \n{{ banner_9 }}\
+        \n{{captured_int_status}}\
+        \n{{ banner_10 }}*\
+        \n{{captured_ip_prot}}\
+        \n{{ banner_11 }}\
+        \n{{captured_vrf}}\
+        \n{{ banner_12 }}\
+        \n{{captured_standby_brief}}\
+        \n{{ banner_13 }}\
+        \n{{captured_ip_ospf_neigh}}\
+        \n{{ banner_14 }}\
+        \n{{captured_run_spanning_tree}}\
+        \n{{ banner_15 }}\
+        \n{{captured_spanning_tree_root}}\
+        \n{{ banner_16 }}\
+        \n{{captured_spanning_tree}}\
+        \n{{ banner_17 }}\
+        \n{{captured_counters}}\
+        \n{{ banner_18 }}\
+        \n{{captured_trunk}}\
+        \n{{ banner_19 }}\
+        \n{{captured_vlan}}\
+        \n{{ banner_20 }}\
+        \n{{captured_port_channel}}\
+        \n{{ banner_21 }}\
+        \n{{captured_route_vrf}}\
+        \n{{ banner_22 }}\
+        \n{{captured_rpoute_vrf}}\
+        \n\n"
+
+    - name: replace cisco new line 1
+      set_fact:
+        captured_output: "{{ captured_output | replace('\\t','\n') }}"
+
+    - name: replace cisco new line 2
+      set_fact:
+        captured_output: "{{ captured_output | replace(\"', '\",'\n') }}"
+  
+    - name: replace opening bracket
+      set_fact:
+        captured_output: "{{ captured_output | replace(\"[['\",'') }}"
+
+    - name: replace closing bracket
+      set_fact:
+        captured_output: "{{ captured_output | replace(\"']]\",'') }}"
+
+    - name: Gather all outputs
+      set_fact:
+        final_list: "{{ ansible_play_hosts | map('extract', hostvars) | map(attribute = 'captured_output') |  list }}"
+      run_once: yes
+
+    - name: get timestamp
+      set_fact: time="{{lookup('pipe','date \"+%Y-%m-%d-%H-%M\"')}}"
+      run_once: true
+
+    - name: set file name
+      set_fact: output_file="device_output-{{ time }}.txt"
+      run_once: true
+
+    - name: Write list to file
+      copy:
+        content: "{{ final_list | join('\n') }}" 
+        dest: "{{ output_file }}"
+      run_once: yes
+
+    - name: email results
+      mail:
+        host: '{{ smtp_server }}'
+        port: 25
+        to:
+        from: '{{ from_address }}'
+        subject: "Precheck Results {{ time }}"
+        body: "Attached are the precheck results"
+        attach:
+          - "{{ output_file }}"
+      run_once: true
+
+    - name: Delete file
+      file:
+        state: absent
+        path: "{{ output_file }}"
+      run_once: true
+
+#    - name: read file
+#      debug:
+#        msg: "{{lookup('file', 'device_output.txt') }}"
+#        #msg: "{{ final_list }}"
+#      run_once: yes

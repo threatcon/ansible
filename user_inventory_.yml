@@ -1,0 +1,73 @@
+---
+
+  - hosts: localhost
+    connection: local
+    gather_facts: no
+    
+    vars:
+        pre_list: "{{ ip_list | replace(' ','') }}"
+        adoUser:  "{{ GIT_USER }}"
+        adoPass:  '{{ GIT_PASSWORD }}'
+
+    tasks:
+    -   name: split ip list
+        set_fact:
+            dev_list: "{{ pre_list.split(',') }}"
+
+    -   name:   display output
+        debug:
+            var: dev_list
+
+    - name: copy output to file
+      copy:
+        content: |-
+          [all]
+          {% for key in dev_list %}
+          {{key}}
+          {% endfor %}
+        dest: "precheck_inventory"
+  
+    - name: Delete directory
+      file:
+        state: absent
+        path: //inventory_files
+
+    - name: Create directory
+      file:
+        state: directory
+        path: //inventory_files
+
+    - name: git clone
+      command: git clone https://{{ adoUser }}:{{ adoPass }}@{{ site }}
+      args:
+        chdir: //inventory_files
+      ignore_errors: true
+
+    - name: git checkout
+      command: git checkout development
+      args:
+        chdir: //inventory_files/device_upgrade_prechecks
+      
+    - name: git pull
+      command: git pull origin development
+      args:
+        chdir: //inventory_files/device_upgrade_prechecks
+
+    - name: copy
+      copy:
+        src: "precheck_inventory"
+        dest: //inventory_files/device_upgrade_prechecks/inventory_files
+        backup: yes
+
+    - name: Git config 
+      command: git config --global user.email "ado@{{ domain }}"
+
+    - name: git add , commit, push to origin
+      command: "{{ item }}"
+      args:
+        chdir: //inventory_files/device_upgrade_prechecks/inventory_files
+      with_items:
+        - git add precheck_inventory
+        - git commit -m "adding content to inventory"
+        - git push origin development
+      ignore_errors: true
